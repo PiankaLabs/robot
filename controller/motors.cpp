@@ -6,11 +6,11 @@ void apply_motor_state(State* state, int low_pin, int high_pin, int speed_pin) {
   int speed = state->speed;
 
   if (direction == Forward) {
-    digitalWrite(low_pin,  LOW);
-    digitalWrite(high_pin, HIGH);
-  } else {
     digitalWrite(low_pin,  HIGH);
     digitalWrite(high_pin, LOW);
+  } else {
+    digitalWrite(low_pin,  LOW);
+    digitalWrite(high_pin, HIGH);
   }
 
   analogWrite(speed_pin, speed);
