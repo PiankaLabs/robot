@@ -1,8 +1,6 @@
 #ifndef COMMANDS
 #define COMMANDS
 
-#include "constants.h"
-
 struct command
 {
    int motor;
