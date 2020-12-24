@@ -1,4 +1,5 @@
 #include "serial.h"
+#include "constants.h"
 #include <HardwareSerial.h>
 
 /* format: [motor][direction][speed]
@@ -8,6 +9,14 @@
 Command parse_command() {
   Command command;
   String message = Serial.readStringUntil('\n');
+
+  //TODO: generalize out commands (or to/from communications)
+  if (message == "hello") {
+    command.hello = true;
+    return command;
+  }
+
+  command.hello = false;
 
   // parse structure
   char motor = message.charAt(0);

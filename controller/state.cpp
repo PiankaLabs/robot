@@ -11,6 +11,11 @@ State RightMotor = {
 };
 
 void update_state(Command command) {
+  //TODO: leaky SRP
+  if (command.hello) {
+    return;
+  }
+  
   State* motor;
 
   // choose motor

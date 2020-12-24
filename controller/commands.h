@@ -3,9 +3,10 @@
 
 struct command
 {
-   int motor;
-   int direction;
-   float speed;
+  bool hello;  
+  int motor;
+  int direction;
+  float speed;
 };
 
 typedef struct command Command;
