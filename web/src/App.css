@@ -41,6 +41,23 @@
   width: 100%;
 }
 
+.Audio {
+  display: none;
+}
+
+.Start {
+  background-color: #282c34;
+  padding-top: 400px;
+}
+
+.Start a {
+  color: white;
+  text-decoration: none;
+  border: 4px solid white;
+  padding: 20px 50px;
+  font-size: 128px;
+}
+
 .Joystick {
   position: absolute;
   top: 50px;

@@ -7,14 +7,36 @@ import axios from 'axios';
 function App() {
   return (
     <div className="App">
+      <div id="start" className="Start">
+        <a onClick={start} href="#">&#x25b6;</a>
+      </div>
       <div className="App-header">
-        <img src="/video" className="Video" alt="" />
+        <img id="video" className="Video" />
+        <audio id="audio" className="Audio" />
       </div>
       <div className="Joystick">
         <Joystick size={100} move={handleMove} stop={handleStop} />
       </div>
     </div>
   );
+}
+
+function start() {
+  let video = document.getElementById("video") as HTMLImageElement
+  let audio = document.getElementById("audio") as HTMLAudioElement
+
+  video.src = "/video"
+  audio.src = "/audio"
+  audio.play()
+
+  audio.currentTime += 5
+
+  let start = document.getElementById("start") as HTMLAnchorElement
+
+  start.hidden = true
+  audio.hidden = true
+
+  return false
 }
 
 function handleMove(event: IJoystickUpdateEvent) {
