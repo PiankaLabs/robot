@@ -10,14 +10,6 @@ Command parse_command() {
   Command command;
   String message = Serial.readStringUntil('\n');
 
-  //TODO: generalize out commands (or to/from communications)
-  if (message == "hello") {
-    command.hello = true;
-    return command;
-  }
-
-  command.hello = false;
-
   // parse structure
   char motor = message.charAt(0);
   char direction = message.charAt(1);

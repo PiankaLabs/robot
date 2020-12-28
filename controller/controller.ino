@@ -15,12 +15,6 @@ void setup() {
 void loop() {
   if (Serial.available() > 0) {
     Command command = parse_command();
-
-    //TODO: leaky SRP
-    if (command.hello) {
-      Serial.println("hello");
-    }
-    
     update_state(command);
   }
 
