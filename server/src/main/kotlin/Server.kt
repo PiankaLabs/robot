@@ -16,7 +16,10 @@ fun main() {
                 resources("/")
             }
             get("/video") {
-                call.respond(Streaming.Writer)
+                call.respond(Streaming.VideoWriter)
+            }
+            get("/audio") {
+                call.respond(Streaming.AudioWriter)
             }
             get("/robot/{x}/{y}") {
                 val x = call.parameters["x"].toString().toInt() * 2 // -100 to 100

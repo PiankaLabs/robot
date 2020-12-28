@@ -2,12 +2,14 @@ package com.piankalabs
 
 import java.util.*
 import nu.pattern.OpenCV
+import org.opencv.core.Core
 import org.opencv.core.Mat
 import org.opencv.videoio.VideoCapture
 
 object Camera {
 
     init {
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME)
         OpenCV.loadShared()
     }
 
