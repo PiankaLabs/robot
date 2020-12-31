@@ -62,6 +62,7 @@
   position: absolute;
   top: 64px;
   right: 64px;
+  opacity: 0.5;
   visibility: hidden;
 }
 
