@@ -18,11 +18,14 @@ object Streaming {
         override val contentType =
             ContentType
                 .parse("multipart/x-mixed-replace")
-                .withParameter("boundary","stream")
+                .withParameter("boundary", "stream")
 
         override suspend fun writeTo(channel: ByteWriteChannel) {
             while (true) {
-                pushCurrentFrame(channel)
+                val frame = Camera.currentFrame()
+                val bytes = toBytes(frame)
+
+                pushCurrentFrame(channel, bytes)
             }
         }
     }
@@ -38,23 +41,53 @@ object Streaming {
         }
     }
 
+    object SpeakerWaveformWriter: OutgoingContent.WriteChannelContent() {
+        override val contentType =
+            ContentType
+                .parse("multipart/x-mixed-replace")
+                .withParameter("boundary", "stream")
+
+        override suspend fun writeTo(channel: ByteWriteChannel) {
+            while (true) {
+                val frame = Speaker.waveform().image()
+                val bytes = toBytes(frame)
+
+                pushCurrentFrame(channel, bytes)
+            }
+        }
+    }
+
+    object MicrophoneWaveformWriter: OutgoingContent.WriteChannelContent() {
+        override val contentType =
+            ContentType
+                .parse("multipart/x-mixed-replace")
+                .withParameter("boundary", "stream")
+
+        override suspend fun writeTo(channel: ByteWriteChannel) {
+            while (true) {
+                val frame = Microphone.waveform().image()
+                val bytes = toBytes(frame)
+
+                pushCurrentFrame(channel, bytes)
+            }
+        }
+    }
+
     /* video */
     private const val clrf = "\r\n"
 
-    private suspend fun pushCurrentFrame(channel: ByteWriteChannel) {
-        val frame = Camera.currentFrame()
-        val bytes = toBytes(frame)
-        val headers = headers(bytes)
+    private suspend fun pushCurrentFrame(channel: ByteWriteChannel, frame: ByteArray) {
+        val headers = headers(frame)
         val boundary = boundary()
 
         channel.writeFully(headers)
-        channel.writeFully(bytes)
+        channel.writeFully(frame)
         channel.writeFully(boundary)
     }
 
     private fun headers(bytes: ByteArray): ByteArray {
         val headers =
-            header("Content-Type", "image/jpeg") +
+            header("Content-Type", "image/png") +
             header("Content-Length", bytes.size) + clrf
 
         return headers.toByteArray()
@@ -71,14 +104,21 @@ object Streaming {
     private fun toBytes(frame: Mat): ByteArray {
         val image = toBufferedImage(frame)
         val stream = ByteArrayOutputStream()
-        ImageIO.write(image, "jpg", stream)
+        ImageIO.write(image, "png", stream)
+
+        return stream.toByteArray()
+    }
+
+    private fun toBytes(image: BufferedImage): ByteArray {
+        val stream = ByteArrayOutputStream()
+        ImageIO.write(image, "png", stream)
 
         return stream.toByteArray()
     }
 
     private fun toBufferedImage(frame: Mat): BufferedImage {
         val encoded = MatOfByte()
-        Imgcodecs.imencode(".jpg", frame, encoded)
+        Imgcodecs.imencode(".png", frame, encoded)
         val bytes = encoded.toArray()
         val stream = ByteArrayInputStream(bytes)
 
@@ -88,18 +128,18 @@ object Streaming {
     /* audio */
     //http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html
     private fun waveHeader(): ByteArray {
-        return writeString ("RIFF")        + // riff header
+        return writeString("RIFF")        + // riff header
                writeInteger(Int.MAX_VALUE) + // chunk size (max for stream)
-               writeString ("WAVE")        + // wave header
-               writeString ("fmt ")        + // format chunk
+               writeString("WAVE")        + // wave header
+               writeString("fmt ")        + // format chunk
                writeInteger(16)            + // chunk size
-               writeShort  (1)             + // format code
-               writeShort  (2)             + // channels
+               writeShort(1)             + // format code
+               writeShort(2)             + // channels
                writeInteger(16000)         + // sample rate
                writeInteger(64000)         + // data rate
-               writeShort  (4)             + // data block size
-               writeShort  (16)            + // bits per sample
-               writeString ("data")        + // data chunk
+               writeShort(4)             + // data block size
+               writeShort(16)            + // bits per sample
+               writeString("data")        + // data chunk
                writeInteger(Int.MAX_VALUE)   // chunk size (max for stream)
     }
 

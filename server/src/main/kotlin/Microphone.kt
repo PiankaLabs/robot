@@ -5,6 +5,8 @@ import javax.sound.sampled.*
 
 object Microphone {
 
+    private val waveform = Waveform()
+
     private fun audioFormat(): AudioFormat {
         val sampleRate = 16000.0f
         val sampleSizeInBits = 16
@@ -34,10 +36,17 @@ object Microphone {
         line.open(format)
         line.start()
 
+        waveform.start()
+
         while (true) {
             val data = ByteArray(line.bufferSize / 5)
             val size = line.read(data, 0, data.size)
             stream.write(data, 0, size)
+            waveform.sample(data)
         }
+    }
+
+    fun waveform(): Waveform {
+        return waveform
     }
 }

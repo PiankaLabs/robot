@@ -15,6 +15,7 @@ object Robot {
         port.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 0, 0);
         port.openPort()
 
+        // let the port initialize
         Thread.sleep(2000)
 
         port
