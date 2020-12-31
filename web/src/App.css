@@ -60,6 +60,32 @@
 
 .Joystick {
   position: absolute;
-  top: 50px;
-  right: 50px;
+  top: 64px;
+  right: 64px;
+  visibility: hidden;
+}
+
+.MicrophoneWaveform {
+  color: white;
+  position: absolute;
+  bottom: 192px;
+  right: 32px;
+  font-size: 10px;
+  visibility: hidden;
+}
+
+.AudioWaveform {
+  color: white;
+  position: absolute;
+  bottom: 32px;
+  right: 32px;
+  font-size: 10px;
+  visibility: hidden;
+}
+
+.WaveformLabel {
+  display: block;
+  float: left;
+  opacity: 0.5;
+  visibility: hidden;
 }
