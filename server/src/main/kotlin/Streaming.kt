@@ -74,7 +74,7 @@ object Streaming {
     }
 
     /* video */
-    private const val clrf = "\r\n"
+    private const val crlf = "\r\n"
 
     private suspend fun pushCurrentFrame(channel: ByteWriteChannel, frame: ByteArray) {
         val headers = headers(frame)
@@ -88,25 +88,21 @@ object Streaming {
     private fun headers(bytes: ByteArray): ByteArray {
         val headers =
             header("Content-Type", "image/png") +
-            header("Content-Length", bytes.size) + clrf
+            header("Content-Length", bytes.size) + crlf
 
         return headers.toByteArray()
     }
 
     private fun <A>header(key: String, value: A): String {
-        return key + ": " + value.toString() + clrf
+        return key + ": " + value.toString() + crlf
     }
 
     private fun boundary(): ByteArray {
-        return "$clrf--stream$clrf".toByteArray()
+        return "$crlf--stream$crlf".toByteArray()
     }
 
     private fun toBytes(frame: Mat): ByteArray {
-        val image = toBufferedImage(frame)
-        val stream = ByteArrayOutputStream()
-        ImageIO.write(image, "png", stream)
-
-        return stream.toByteArray()
+        return toBytes(toBufferedImage(frame))
     }
 
     private fun toBytes(image: BufferedImage): ByteArray {
@@ -129,18 +125,18 @@ object Streaming {
     //http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html
     private fun waveHeader(): ByteArray {
         return writeString("RIFF")        + // riff header
-               writeInteger(Int.MAX_VALUE) + // chunk size (max for stream)
+               writeInteger(Int.MAX_VALUE)      + // chunk size (max for stream)
                writeString("WAVE")        + // wave header
                writeString("fmt ")        + // format chunk
-               writeInteger(16)            + // chunk size
-               writeShort(1)             + // format code
-               writeShort(2)             + // channels
-               writeInteger(16000)         + // sample rate
-               writeInteger(64000)         + // data rate
-               writeShort(4)             + // data block size
-               writeShort(16)            + // bits per sample
+               writeInteger(16)           + // chunk size
+               writeShort(1)              + // format code
+               writeShort(2)              + // channels
+               writeInteger(16000)        + // sample rate
+               writeInteger(64000)        + // data rate
+               writeShort(4)              + // data block size
+               writeShort(16)             + // bits per sample
                writeString("data")        + // data chunk
-               writeInteger(Int.MAX_VALUE)   // chunk size (max for stream)
+               writeInteger(Int.MAX_VALUE)        // chunk size (max for stream)
     }
 
     private fun writeString(value: String): ByteArray {

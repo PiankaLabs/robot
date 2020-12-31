@@ -25,7 +25,7 @@ object Robot {
         PrintWriter(port.outputStream, true)
     }
 
-    fun Double.round(decimals: Int): Double {
+    private fun Double.round(decimals: Int): Double {
         var multiplier = 1.0
         repeat(decimals) { multiplier *= 10 }
         return round(this * multiplier) / multiplier
@@ -40,8 +40,8 @@ object Robot {
          */
 
         if (x == 0 && y == 0) {
-            writer.println("lf0")
-            writer.println("rf0")
+            writer.println("lf0.0")
+            writer.println("rf0.0")
             return
         }
 

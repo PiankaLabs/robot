@@ -1,9 +1,12 @@
 package com.piankalabs
 
+import org.slf4j.LoggerFactory
 import java.io.OutputStream
 import javax.sound.sampled.*
 
 object Microphone {
+
+    private val logger = LoggerFactory.getLogger("microphone")
 
     private val waveform = Waveform()
 
@@ -28,7 +31,7 @@ object Microphone {
         val info = DataLine.Info(TargetDataLine::class.java, format)
 
         if (!AudioSystem.isLineSupported(info)) {
-            println("Line not supported")
+            logger.error("Audio target data line not supported")
             return
         }
 
