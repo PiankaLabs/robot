@@ -94,11 +94,15 @@ class Waveform {
             samples
                 .filterNotNull() // getting weird NPEs - probably a Guava queue being in beta issue
                 .chunked(2)
-                .map {
-                    val first = it[0]
-                    val second = it[1]
+                .flatMap {
+                    try {
+                        val first = it[0]
+                        val second = it[1]
 
-                    Summary(minOf(first, second), maxOf(first, second))
+                        listOf(Summary(minOf(first, second), maxOf(first, second)))
+                    } catch (_: Throwable) {
+                        emptyList()
+                    }
                 }
 
         val min = pairs.fold(Short.MAX_VALUE) { acc, sample -> minOf(acc, sample.min) }
