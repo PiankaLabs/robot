@@ -4,16 +4,14 @@ let length: number = 0
 const bufferSize = 4096
 
 type RecordingCallback = (blob: Blob) => void
-type StreamSourceCreator = (mediaStream: MediaStream) => MediaStreamAudioSourceNode
-type ScriptProcessorCreator = (mediaStreamAudioSource: MediaStreamAudioSourceNode) => ScriptProcessorNode
 type AudioEventProcessorCreator = (scriptProcessor: ScriptProcessorNode) => void
 
 export let stream: MediaStream
 
 export function startRecording(callback: RecordingCallback) {
   createStream()
-    .then(createStreamSource())
-    .then(createScriptProcessor())
+    .then(createStreamSource)
+    .then(createScriptProcessor)
     .then(createAudioEventProcessor(callback))
 }
 
@@ -26,24 +24,20 @@ function createStream(): Promise<MediaStream> {
   return navigator.mediaDevices.getUserMedia(settings)
 }
 
-function createStreamSource(): StreamSourceCreator {
-  return (mediaStream: MediaStream) => {
-    stream = mediaStream
-    const context = new AudioContext()
-    return context.createMediaStreamSource(mediaStream)
-  }
+function createStreamSource(mediaStream: MediaStream) {
+  stream = mediaStream
+  const context = new AudioContext()
+  return context.createMediaStreamSource(mediaStream)
 }
 
-function createScriptProcessor(): ScriptProcessorCreator {
-  return (mediaStreamAudioSource: MediaStreamAudioSourceNode) => {
-    const channels = 1
-    const processor = mediaStreamAudioSource.context.createScriptProcessor(bufferSize, channels, channels)
+function createScriptProcessor(mediaStreamAudioSource: MediaStreamAudioSourceNode) {
+  const channels = 1
+  const processor = mediaStreamAudioSource.context.createScriptProcessor(bufferSize, channels, channels)
 
-    mediaStreamAudioSource.connect(processor)
-    processor.connect(mediaStreamAudioSource.context.destination)
+  mediaStreamAudioSource.connect(processor)
+  processor.connect(mediaStreamAudioSource.context.destination)
 
-    return processor
-  }
+  return processor
 }
 
 function createAudioEventProcessor(callback: RecordingCallback): AudioEventProcessorCreator {
