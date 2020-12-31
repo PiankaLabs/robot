@@ -90,3 +90,14 @@
   opacity: 0.5;
   visibility: hidden;
 }
+
+.MuteButton {
+  cursor: pointer;
+  color: white;
+  position: absolute;
+  bottom: 352px;
+  right: 32px;
+  font-size: 32px;
+  opacity: 0.5;
+  visibility: hidden;
+}

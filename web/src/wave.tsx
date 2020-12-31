@@ -8,6 +8,8 @@ type StreamSourceCreator = (mediaStream: MediaStream) => MediaStreamAudioSourceN
 type ScriptProcessorCreator = (mediaStreamAudioSource: MediaStreamAudioSourceNode) => ScriptProcessorNode
 type AudioEventProcessorCreator = (scriptProcessor: ScriptProcessorNode) => void
 
+export let stream: MediaStream
+
 export function startRecording(callback: RecordingCallback) {
   createStream()
     .then(createStreamSource())
@@ -16,7 +18,6 @@ export function startRecording(callback: RecordingCallback) {
 }
 
 function createStream(): Promise<MediaStream> {
-  console.log("Creating stream...")
   const settings = {
     audio: true
   }
@@ -27,7 +28,7 @@ function createStream(): Promise<MediaStream> {
 
 function createStreamSource(): StreamSourceCreator {
   return (mediaStream: MediaStream) => {
-    console.log("Creating stream source...")
+    stream = mediaStream
     const context = new AudioContext()
     return context.createMediaStreamSource(mediaStream)
   }
@@ -35,7 +36,6 @@ function createStreamSource(): StreamSourceCreator {
 
 function createScriptProcessor(): ScriptProcessorCreator {
   return (mediaStreamAudioSource: MediaStreamAudioSourceNode) => {
-    console.log("Creating script processor...")
     const channels = 1
     const processor = mediaStreamAudioSource.context.createScriptProcessor(bufferSize, channels, channels)
 
@@ -48,28 +48,21 @@ function createScriptProcessor(): ScriptProcessorCreator {
 
 function createAudioEventProcessor(callback: RecordingCallback): AudioEventProcessorCreator {
   return (scriptProcessor: ScriptProcessorNode) => {
-    console.log("Creating audio event processor...")
     //TODO: refactor deprecated API
     scriptProcessor.onaudioprocess = (audioProcessingEvent: AudioProcessingEvent) => {
-      console.log("Processing audio event...")
       const channel = 0
-      const data = new Float32Array(bufferSize);
+      const data = new Float32Array(bufferSize)
 
       // copy data out so as not to reuse underlying memory
       // https://stackoverflow.com/questions/59252870/obtaining-microphone-pcm-data-from-getchanneldata-method-using-webaudio-api-does
-      audioProcessingEvent.inputBuffer.copyFromChannel(data, channel);
+      audioProcessingEvent.inputBuffer.copyFromChannel(data, channel)
 
       save(data)
 
       if (length > 10 * 1000) {
-        console.log("Merging, sampling, and encoding buffer...")
-        console.log("Sample rate: " + scriptProcessor.context.sampleRate)
         const blob = samplesToBlob(buffer, length, scriptProcessor.context.sampleRate)
 
-        console.log("Clearing...")
         clear()
-
-        console.log("Calling back...")
         callback(blob)
       }
     }

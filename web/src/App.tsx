@@ -1,10 +1,10 @@
-import React from 'react';
-import './App.css';
-import { Joystick } from 'react-joystick-component';
-import { IJoystickUpdateEvent } from "react-joystick-component/build/lib/Joystick";
-import axios from 'axios';
-import { w3cwebsocket as ws } from "websocket";
-import { startRecording } from "./wave"
+import React from 'react'
+import './App.css'
+import { Joystick } from 'react-joystick-component'
+import { IJoystickUpdateEvent } from "react-joystick-component/build/lib/Joystick"
+import axios from 'axios'
+import { w3cwebsocket as ws } from "websocket"
+import { startRecording, stream } from "./wave"
 
 function App() {
   return (
@@ -27,8 +27,11 @@ function App() {
         <span className="WaveformLabel"><span className="iconify" data-icon="mdi-robot" data-inline="false"></span> 16,000.0 Hz, 16 Bit, stereo, 2 bytes/frame</span><br/>
         <img id="audioWaveform" />
       </div>
+      <div id="muteButton" className="MuteButton" onClick={toggleMute}>
+        <span className="iconify" data-icon="mdi:volume-mute" data-inline="false"></span>
+      </div>
     </div>
-  );
+  )
 }
 
 function start() {
@@ -40,6 +43,8 @@ function start() {
   let microphoneWaveform = document.getElementById("microphoneWaveform") as HTMLImageElement
   let audioWaveform = document.getElementById("audioWaveform") as HTMLImageElement
 
+  let muteButton = document.getElementById("muteButton") as HTMLDivElement
+
   video.src = "/video"
   audio.src = "/audio"
   audio.play()
@@ -48,6 +53,8 @@ function start() {
   microphoneWaveform.style.visibility = "visible"
   audioWaveform.src = "/audio/waveform"
   audioWaveform.style.visibility = "visible"
+
+  muteButton.style.visibility = "visible"
 
   let labels = document.getElementsByClassName("WaveformLabel")
   for (let i = 0; i < labels.length; i++) {
@@ -72,14 +79,20 @@ function start() {
 }
 
 function streamMicrophone() {
-  const client = new ws('wss://piankabot.lan:8443/microphone');
-  client.onclose = (event) => {
-    console.log(event)
-  }
-  client.onerror = (event) => {
-    console.error(event)
-  }
+  const client = new ws('wss://piankabot.lan:8443/microphone')
   client.onopen = () => startRecording((blob: Blob) => blob.arrayBuffer().then((array) => client.send(array)))
+}
+
+function toggleMute() {
+  let muted = false
+
+  stream.getTracks().forEach((t) => {
+    if (t.kind === 'audio') t.enabled = !t.enabled
+    muted = !t.enabled
+  })
+
+  let muteButton = document.getElementById("muteButton") as HTMLDivElement
+  muteButton.style.color = muted ? "red" : "white"
 }
 
 function handleMove(event: IJoystickUpdateEvent) {
@@ -90,4 +103,4 @@ function handleStop(event: IJoystickUpdateEvent) {
   axios.get("/robot/0/0")
 }
 
-export default App;
+export default App
