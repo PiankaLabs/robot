@@ -50,7 +50,7 @@ object Streaming {
         override suspend fun writeTo(channel: ByteWriteChannel) {
             while (true) {
                 val frame = Speaker.waveform().image()
-                val bytes = toBytes(frame)
+                val bytes = toPngBytes(frame)
 
                 pushCurrentFrame(channel, bytes)
             }
@@ -66,7 +66,7 @@ object Streaming {
         override suspend fun writeTo(channel: ByteWriteChannel) {
             while (true) {
                 val frame = Microphone.waveform().image()
-                val bytes = toBytes(frame)
+                val bytes = toPngBytes(frame)
 
                 pushCurrentFrame(channel, bytes)
             }
@@ -87,7 +87,7 @@ object Streaming {
 
     private fun headers(bytes: ByteArray): ByteArray {
         val headers =
-            header("Content-Type", "image/png") +
+            header("Content-Type", "image/jpg") +
             header("Content-Length", bytes.size) + crlf
 
         return headers.toByteArray()
@@ -102,10 +102,17 @@ object Streaming {
     }
 
     private fun toBytes(frame: Mat): ByteArray {
-        return toBytes(toBufferedImage(frame))
+        return toJpegBytes(toBufferedImage(frame))
     }
 
-    private fun toBytes(image: BufferedImage): ByteArray {
+    private fun toJpegBytes(image: BufferedImage): ByteArray {
+        val stream = ByteArrayOutputStream()
+        ImageIO.write(image, "jpg", stream)
+
+        return stream.toByteArray()
+    }
+
+    private fun toPngBytes(image: BufferedImage): ByteArray {
         val stream = ByteArrayOutputStream()
         ImageIO.write(image, "png", stream)
 
@@ -114,7 +121,7 @@ object Streaming {
 
     private fun toBufferedImage(frame: Mat): BufferedImage {
         val encoded = MatOfByte()
-        Imgcodecs.imencode(".png", frame, encoded)
+        Imgcodecs.imencode(".jpg", frame, encoded)
         val bytes = encoded.toArray()
         val stream = ByteArrayInputStream(bytes)
 
