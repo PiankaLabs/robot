@@ -7,3 +7,8 @@
 A robot that's controllable from the web, streams video, and bidirectionally streams audio.
 
 <img src="https://www.piankalabs.com/static/media/robot.png" alt="Robot" /><br/>
+
+### Articles
+* [Building a Robot](https://piankalabs.medium.com/building-a-robot-2f292334560f)
+* [Programming a Robot](https://piankalabs.medium.com/programming-a-robot-d4b75c29d9b6)
+
